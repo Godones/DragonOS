@@ -291,7 +291,7 @@ impl Syscall {
             SYS_MKDIR => {
                 let path = args[0] as *const u8;
                 let mode = args[1];
-
+                crate::debug::kprobe::kprobe_test();
                 Self::mkdir(path, mode)
             }
 

@@ -16,7 +16,7 @@ members = [
 ]
 
 [features]
-default = ["backtrace", "kvm"]
+default = ["backtrace", "kvm", "kprobe_test"]
 # 内核栈回溯
 backtrace = []
 # kvm

@@ -81,6 +81,8 @@ fn do_start_kernel() {
     kprobe_init();
     Futex::init();
 
+    crate::bpf::init_bpf_system();
+
     #[cfg(all(target_arch = "x86_64", feature = "kvm"))]
     crate::virt::kvm::kvm_init();
 }

@@ -39,7 +39,7 @@ impl Syscall {
         if max_events <= 0 || max_events as u32 > EventPoll::EP_MAX_EVENTS {
             return Err(SystemError::EINVAL);
         }
-
+        // log::info!("epoll_wait epfd: {}, events: {:?}, max_events: {}, timeout: {}", epfd, events, max_events, timeout);
         let mut timespec = None;
         if timeout == 0 {
             timespec = Some(PosixTimeSpec::new(0, 0));

@@ -119,6 +119,10 @@ bitflags! {
 }
 
 pub trait IndexNode: Any + Sync + Send + Debug + CastFromSync {
+    fn mmap(&self, _start: usize, _len: usize, _offset: usize) -> Result<(), SystemError> {
+        return Err(SystemError::ENOSYS);
+    }
+
     /// @brief 打开文件
     ///
     /// @return 成功：Ok()

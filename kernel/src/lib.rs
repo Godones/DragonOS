@@ -19,6 +19,7 @@
 #![feature(slice_ptr_get)]
 #![feature(sync_unsafe_cell)]
 #![feature(vec_into_raw_parts)]
+#![feature(c_variadic)]
 #![cfg_attr(target_os = "none", no_std)]
 #![allow(internal_features)]
 // clippy的配置
@@ -31,9 +32,9 @@
 #![allow(clippy::single_char_pattern)]
 #![allow(clippy::upper_case_acronyms)]
 
-#[cfg(test)]
-#[macro_use]
-extern crate std;
+// #[cfg(test)]
+// #[macro_use]
+// extern crate std;
 
 use core::panic::PanicInfo;
 
@@ -44,6 +45,7 @@ mod arch;
 mod libs;
 #[macro_use]
 mod include;
+mod bpf;
 mod debug;
 mod driver; // 如果driver依赖了libs，应该在libs后面导出
 mod exception;
@@ -53,12 +55,12 @@ mod ipc;
 mod misc;
 mod mm;
 mod net;
+mod perf;
 mod process;
 mod sched;
 mod smp;
 mod syscall;
 mod time;
-
 #[cfg(target_arch = "x86_64")]
 mod virt;
 

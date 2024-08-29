@@ -2,7 +2,7 @@
 pub mod helper;
 pub mod map;
 pub mod prog;
-use crate::arch::bindgen::linux_bpf::{bpf_attr, bpf_cmd};
+use crate::include::bindings::linux_bpf::{bpf_attr, bpf_cmd};
 use crate::syscall::user_access::UserBufferReader;
 use crate::syscall::Syscall;
 use log::error;

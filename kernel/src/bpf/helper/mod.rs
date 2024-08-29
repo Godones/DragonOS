@@ -1,8 +1,8 @@
 mod print;
-use crate::arch::bindgen::linux_bpf::BPF_F_CURRENT_CPU;
 use crate::bpf::helper::print::trace_printf;
 use crate::bpf::map::BpfMap;
 use crate::bpf::map::{PerCpuInfo, PerCpuInfoImpl};
+use crate::include::bindings::linux_bpf::BPF_F_CURRENT_CPU;
 use crate::libs::lazy_init::Lazy;
 use alloc::{collections::BTreeMap, sync::Arc};
 use core::ffi::c_void;

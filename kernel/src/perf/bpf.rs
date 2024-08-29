@@ -1,6 +1,8 @@
 use super::{PerfEventOps, Result};
-use crate::arch::bindgen::linux_bpf::{perf_event_header, perf_event_mmap_page, perf_event_type};
 use crate::arch::MMArch;
+use crate::include::bindings::linux_bpf::{
+    perf_event_header, perf_event_mmap_page, perf_event_type,
+};
 use crate::libs::spinlock::SpinLock;
 use crate::mm::MemoryManagementArch;
 use crate::perf::util::PerfProbeArgs;

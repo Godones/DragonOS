@@ -1,4 +1,4 @@
-use crate::arch::bindgen::linux_bpf::{
+use crate::include::bindings::linux_bpf::{
     perf_event_attr, perf_event_sample_format, perf_sw_ids, perf_type_id,
 };
 use crate::syscall::user_access::check_and_clone_cstr;

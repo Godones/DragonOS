@@ -1,4 +1,4 @@
-use crate::arch::bindgen::linux_bpf::{bpf_attr, bpf_map_type};
+use crate::include::bindings::linux_bpf::{bpf_attr, bpf_map_type};
 use alloc::string::{String, ToString};
 use core::ffi::CStr;
 use num_traits::FromPrimitive;

@@ -1,5 +1,6 @@
 use super::Result;
 use crate::arch::interrupt::TrapFrame;
+use crate::arch::kprobe::KProbeContext;
 use crate::bpf::helper::BPF_HELPER_FUN_SET;
 use crate::bpf::prog::BpfProg;
 use crate::debug::kprobe::args::KprobeInfo;
@@ -60,11 +61,11 @@ impl CallBackFunc for KprobePerfCallBack {
     fn call(&self, trap_frame: &dyn ProbeArgs) {
         let trap_frame = trap_frame.as_any().downcast_ref::<TrapFrame>().unwrap();
         // log::info!("CallBackFunc {:#x?}", trap_frame);
-        let pt_regs = pt_regs::from(trap_frame);
+        let pt_regs = KProbeContext::from(trap_frame);
         let probe_context = unsafe {
             core::slice::from_raw_parts_mut(
-                &pt_regs as *const pt_regs as *mut u8,
-                size_of::<pt_regs>(),
+                &pt_regs as *const KProbeContext as *mut u8,
+                size_of::<KProbeContext>(),
             )
         };
         // log::info!("The pt_regs ptr: {:#x}", pt_regs as *const TrapFrame as *mut u8 as usize);
@@ -108,57 +109,4 @@ pub fn perf_event_open_kprobe(args: PerfProbeArgs) -> KprobePerfEvent {
     };
     let kprobe = register_kprobe(kprobe_info).expect("create kprobe failed");
     KprobePerfEvent { args, kprobe }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct pt_regs {
-    pub r15: ::core::ffi::c_ulong,
-    pub r14: ::core::ffi::c_ulong,
-    pub r13: ::core::ffi::c_ulong,
-    pub r12: ::core::ffi::c_ulong,
-    pub rbp: ::core::ffi::c_ulong,
-    pub rbx: ::core::ffi::c_ulong,
-    pub r11: ::core::ffi::c_ulong,
-    pub r10: ::core::ffi::c_ulong,
-    pub r9: ::core::ffi::c_ulong,
-    pub r8: ::core::ffi::c_ulong,
-    pub rax: ::core::ffi::c_ulong,
-    pub rcx: ::core::ffi::c_ulong,
-    pub rdx: ::core::ffi::c_ulong,
-    pub rsi: ::core::ffi::c_ulong,
-    pub rdi: ::core::ffi::c_ulong,
-    pub orig_rax: ::core::ffi::c_ulong,
-    pub rip: ::core::ffi::c_ulong,
-    pub cs: ::core::ffi::c_ulong,
-    pub eflags: ::core::ffi::c_ulong,
-    pub rsp: ::core::ffi::c_ulong,
-    pub ss: ::core::ffi::c_ulong,
-}
-
-impl From<&TrapFrame> for pt_regs {
-    fn from(trap_frame: &TrapFrame) -> Self {
-        Self {
-            r15: trap_frame.r15,
-            r14: trap_frame.r14,
-            r13: trap_frame.r13,
-            r12: trap_frame.r12,
-            rbp: trap_frame.rbp,
-            rbx: trap_frame.rbx,
-            r11: trap_frame.r11,
-            r10: trap_frame.r10,
-            r9: trap_frame.r9,
-            r8: trap_frame.r8,
-            rax: trap_frame.rax,
-            rcx: trap_frame.rcx,
-            rdx: trap_frame.rdx,
-            rsi: trap_frame.rsi,
-            rdi: trap_frame.rdi,
-            orig_rax: 0,
-            rip: trap_frame.rip,
-            cs: trap_frame.cs,
-            eflags: trap_frame.rflags,
-            rsp: trap_frame.rsp,
-            ss: trap_frame.ss,
-        }
-    }
 }

@@ -3,12 +3,12 @@ mod bpf;
 mod kprobe;
 mod util;
 
-use crate::arch::bindgen::linux_bpf::{
-    perf_event_attr, perf_event_sample_format, perf_sw_ids, perf_type_id,
-};
 use crate::filesystem::vfs::file::{File, FileMode};
 use crate::filesystem::vfs::syscall::ModeType;
 use crate::filesystem::vfs::{FilePrivateData, FileSystem, FileType, IndexNode, Metadata};
+use crate::include::bindings::linux_bpf::{
+    perf_event_attr, perf_event_sample_format, perf_sw_ids, perf_type_id,
+};
 use crate::libs::casting::DowncastArc;
 use crate::libs::spinlock::{SpinLock, SpinLockGuard};
 use crate::net::event_poll::{EPollEventType, EPollItem, EventPoll, KernelIoctlData};

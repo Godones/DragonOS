@@ -3,12 +3,12 @@ mod hash_map;
 mod util;
 
 use super::Result;
-use crate::arch::bindgen::linux_bpf::{bpf_attr, bpf_map_type};
 use crate::bpf::map::array_map::{ArrayMap, PerCpuArrayMap, PerfEventArrayMap};
 use crate::bpf::map::util::{BpfMapGetNextKeyArg, BpfMapMeta, BpfMapUpdateArg};
 use crate::filesystem::vfs::file::{File, FileMode};
 use crate::filesystem::vfs::syscall::ModeType;
 use crate::filesystem::vfs::{FilePrivateData, FileSystem, FileType, IndexNode, Metadata};
+use crate::include::bindings::linux_bpf::{bpf_attr, bpf_map_type};
 use crate::libs::casting::DowncastArc;
 use crate::libs::spinlock::{SpinLock, SpinLockGuard};
 use crate::process::ProcessManager;

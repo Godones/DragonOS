@@ -1,9 +1,9 @@
 use super::super::Result;
-use crate::arch::x86_64::bindgen::linux_bpf::*;
 use crate::bpf::map::BpfMap;
 use crate::bpf::prog::util::VerifierLogLevel;
 use crate::bpf::prog::BpfProg;
 use crate::filesystem::vfs::file::FileDescriptorVec;
+use crate::include::bindings::linux_bpf::*;
 use crate::libs::casting::DowncastArc;
 use crate::libs::rwlock::RwLock;
 use alloc::{sync::Arc, vec::Vec};

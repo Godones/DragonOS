@@ -2,12 +2,12 @@ mod util;
 mod verifier;
 
 use super::Result;
-use crate::arch::bindgen::linux_bpf::bpf_attr;
 use crate::bpf::prog::util::{BpfProgMeta, BpfProgVerifierInfo};
 use crate::bpf::prog::verifier::BpfProgVerifier;
 use crate::filesystem::vfs::file::{File, FileMode};
 use crate::filesystem::vfs::syscall::ModeType;
 use crate::filesystem::vfs::{FilePrivateData, FileSystem, FileType, IndexNode, Metadata};
+use crate::include::bindings::linux_bpf::bpf_attr;
 use crate::libs::spinlock::SpinLockGuard;
 use crate::process::ProcessManager;
 use alloc::string::String;

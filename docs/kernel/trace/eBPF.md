@@ -85,8 +85,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
 ```
 [dependencies]
-aya = { git = "https://github.com/os-module/tiny-aya.git" }
-aya-log = { git = "https://github.com/os-module/tiny-aya.git" }
+aya = { git = "https://github.com/DragonOS-Community/tiny-aya.git" }
+aya-log = { git = "https://github.com/DragonOS-Community/tiny-aya.git" }
 ```
 
 只需要稍加修改，就可以利用Aya现有的工具完成eBPF程序的实现。

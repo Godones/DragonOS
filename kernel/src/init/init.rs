@@ -1,3 +1,8 @@
+use super::{
+    boot::{boot_callback_except_early, boot_callbacks},
+    cmdline::kenrel_cmdline_param_manager,
+};
+use crate::debug::kprobe::kprobe_init;
 use crate::{
     arch::{
         init::{early_setup_arch, setup_arch, setup_arch_post},
@@ -29,11 +34,6 @@ use crate::{
     },
 };
 
-use super::{
-    boot::{boot_callback_except_early, boot_callbacks},
-    cmdline::kenrel_cmdline_param_manager,
-};
-
 /// The entry point for the kernel
 ///
 /// 前面可能会有一个架构相关的函数
@@ -58,7 +58,7 @@ fn do_start_kernel() {
 
     if scm_reinit().is_ok() {
         if let Err(e) = textui_init() {
-            warn!("Failed to init textui: {:?}", e);
+            log::warn!("Failed to init textui: {:?}", e);
         }
     }
     // 初始化内核命令行参数

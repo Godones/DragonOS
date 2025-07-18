@@ -281,10 +281,34 @@ impl LockedFATInode {
                 return Err(SystemError::EROFS);
             }
         };
+        drop(old_inode_guard);
         // 检查文件是否存在
         // old_dir.check_existence(old_name, Some(false), guard.fs.upgrade().unwrap())?;
 
-        old_dir.rename(fs, old_name, new_name)?;
+        let res = old_dir.rename(fs, old_name, new_name);
+
+        if let Err(SystemError::EEXIST) = res {
+            // 如果目标目录项存在，那么就返回错误
+            let new_inode = guard.find(new_name).unwrap();
+            let mut offset = 0;
+            let mut buf = [0u8; 4096];
+            loop {
+                let read_len = old_inode.read_sync(offset, &mut buf).unwrap();
+                if read_len == 0 {
+                    break;
+                }
+                let write_len = new_inode.write_sync(offset, &buf[0..read_len]).unwrap();
+                if write_len < read_len {
+                    error!(
+                        "FATFS: write link file failed, read_len={read_len}, write_len={write_len}"
+                    );
+                    return Err(SystemError::EIO);
+                }
+                offset += write_len;
+            }
+            return Ok(());
+        }
+
         let _nod = guard.children.remove(&to_search_name(old_name));
         Ok(())
     }
@@ -1622,6 +1646,28 @@ impl IndexNode for LockedFATInode {
                 return Err(SystemError::EROFS);
             }
         }
+    }
+
+    fn link(&self, name: &str, other: &Arc<dyn IndexNode>) -> Result<(), SystemError> {
+        // fat32 does not support hard link
+        let ty = other.metadata()?.file_type;
+        let mode = other.metadata()?.mode;
+        let new_inode = self.create(name, ty, mode).unwrap();
+        let mut offset = 0;
+        let mut buf = [0u8; 4096];
+        loop {
+            let read_len = other.read_sync(offset, &mut buf).unwrap();
+            if read_len == 0 {
+                break;
+            }
+            let write_len = new_inode.write_sync(offset, &buf[0..read_len]).unwrap();
+            if write_len < read_len {
+                error!("FATFS: write link file failed, read_len={read_len}, write_len={write_len}");
+                return Err(SystemError::EIO);
+            }
+            offset += write_len;
+        }
+        Ok(())
     }
 
     fn fs(&self) -> Arc<dyn FileSystem> {

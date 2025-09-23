@@ -304,13 +304,12 @@ impl Listening {
         if connected.with::<smoltcp::socket::tcp::Socket, _, _>(|socket| !socket.is_active()) {
             return Err(SystemError::EAGAIN_OR_EWOULDBLOCK);
         }
-        
 
         let remote_endpoint = connected.with_mut::<smoltcp::socket::tcp::Socket, _, _>(|socket| {
             let accept_state = socket.state();
-            log::error!("accept state: {}, {}", accept_state,  socket.can_recv());
+            log::error!("accept state: {}, {}", accept_state, socket.can_recv());
             // socket.listen(self.listen_addr).unwrap();
-           
+
             socket
                 .remote_endpoint()
                 .expect("A Connected Tcp With No Remote Endpoint")
@@ -433,6 +432,11 @@ impl Established {
                         Err(tcp::RecvError::Finished) => Ok(0),
                     }
                 } else {
+                    log::error!(
+                        "TcpSocket::try_recv: no buffer {} {}",
+                        socket.may_recv(),
+                        socket.state()
+                    );
                     Err(SystemError::ENOBUFS)
                 }
             })
@@ -441,13 +445,22 @@ impl Established {
     pub fn send_slice(&self, buf: &[u8]) -> Result<usize, SystemError> {
         self.inner
             .with_mut::<smoltcp::socket::tcp::Socket, _, _>(|socket| {
-                log::error!("TcpSocket::try_send: can_send {} may_send {} state {}", socket.can_send(), socket.may_send(), socket.state());
+                log::error!(
+                    "TcpSocket::try_send: can_send {} may_send {} state {}",
+                    socket.can_send(),
+                    socket.may_send(),
+                    socket.state()
+                );
                 if socket.can_send() {
                     socket
                         .send_slice(buf)
                         .map_err(|_| SystemError::ECONNABORTED)
                 } else {
-                    log::error!("TcpSocket::try_send: no buffer {} {}", socket.may_send(), socket.state());
+                    log::error!(
+                        "TcpSocket::try_send: no buffer {} {}",
+                        socket.may_send(),
+                        socket.state()
+                    );
                     Err(SystemError::ENOBUFS)
                 }
             })

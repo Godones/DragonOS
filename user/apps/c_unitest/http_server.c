@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #define PORT 12580
@@ -198,15 +199,30 @@ int main(int argc, char const *argv[]) {
       exit(EXIT_CODE);
     }
 
-    // 接收客户端消息
-    valread = read(new_socket, buffer, MAX_REQUEST_SIZE);
-    printf("%s\n", buffer);
+    // 创建子进程处理请求
+    pid_t pid = fork();
+    if (pid == 0) {
+      // 子进程
+      close(server_fd); // 子进程不需要监听socket
+      
+      // 接收客户端消息
+      valread = read(new_socket, buffer, MAX_REQUEST_SIZE);
+      printf("Received %d bytes:\n", valread);
+      printf("%s\n", buffer);
 
-    // 处理请求
-    handle_request(new_socket, buffer);
+      // 处理请求
+      handle_request(new_socket, buffer);
 
-    // 关闭客户端连接
-    close(new_socket);
+      // 关闭客户端连接
+      close(new_socket);
+      exit(0); // 子进程退出
+    } else if (pid > 0) {
+      // 父进程
+      close(new_socket); // 父进程不需要客户端socket
+    } else {
+      perror("fork failed");
+      close(new_socket);
+    }
   }
   // 关闭tcp socket
   close(server_fd);

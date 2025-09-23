@@ -344,6 +344,7 @@ impl Socket for TcpSocket {
     }
 
     fn accept(&self) -> Result<(Arc<dyn Socket>, Endpoint), SystemError> {
+        log::error!("TcpSocket::accept: called");
         if self.is_nonblock() {
             self.try_accept()
         } else {
@@ -403,6 +404,7 @@ impl Socket for TcpSocket {
     }
 
     fn do_close(&self) -> Result<(), SystemError> {
+        log::error!("TcpSocket::close: called");
         let Some(inner) = self.inner.write().take() else {
             log::warn!("TcpSocket::close: already closed, unexpected");
             return Ok(());

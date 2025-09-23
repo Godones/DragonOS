@@ -10,8 +10,8 @@ use smoltcp::socket::tcp;
 use system_error::SystemError;
 
 // pub const DEFAULT_METADATA_BUF_SIZE: usize = 1024;
-pub const DEFAULT_RX_BUF_SIZE: usize = 512 * 1024;
-pub const DEFAULT_TX_BUF_SIZE: usize = 512 * 1024;
+pub const DEFAULT_RX_BUF_SIZE: usize = 128 * 1024;
+pub const DEFAULT_TX_BUF_SIZE: usize = 128 * 1024;
 
 fn new_smoltcp_socket() -> smoltcp::socket::tcp::Socket<'static> {
     let rx_buffer = smoltcp::socket::tcp::SocketBuffer::new(vec![0; DEFAULT_RX_BUF_SIZE]);
@@ -133,7 +133,7 @@ impl Init {
         } else {
             smoltcp::wire::IpListenEndpoint::from(local)
         };
-        log::debug!("listen at {:?}", listen_addr);
+        log::error!("listen at {:?}", listen_addr);
         let mut inners = Vec::new();
         if let Err(err) = || -> Result<(), SystemError> {
             for _ in 0..(backlog - 1) {
@@ -304,8 +304,13 @@ impl Listening {
         if connected.with::<smoltcp::socket::tcp::Socket, _, _>(|socket| !socket.is_active()) {
             return Err(SystemError::EAGAIN_OR_EWOULDBLOCK);
         }
+        
 
-        let remote_endpoint = connected.with::<smoltcp::socket::tcp::Socket, _, _>(|socket| {
+        let remote_endpoint = connected.with_mut::<smoltcp::socket::tcp::Socket, _, _>(|socket| {
+            let accept_state = socket.state();
+            log::error!("accept state: {}, {}", accept_state,  socket.can_recv());
+            // socket.listen(self.listen_addr).unwrap();
+           
             socket
                 .remote_endpoint()
                 .expect("A Connected Tcp With No Remote Endpoint")
@@ -418,7 +423,7 @@ impl Established {
     pub fn recv_slice(&self, buf: &mut [u8]) -> Result<usize, SystemError> {
         self.inner
             .with_mut::<smoltcp::socket::tcp::Socket, _, _>(|socket| {
-                if socket.can_send() {
+                if socket.can_recv() {
                     match socket.recv_slice(buf) {
                         Ok(size) => Ok(size),
                         Err(tcp::RecvError::InvalidState) => {
@@ -436,11 +441,13 @@ impl Established {
     pub fn send_slice(&self, buf: &[u8]) -> Result<usize, SystemError> {
         self.inner
             .with_mut::<smoltcp::socket::tcp::Socket, _, _>(|socket| {
+                log::error!("TcpSocket::try_send: can_send {} may_send {} state {}", socket.can_send(), socket.may_send(), socket.state());
                 if socket.can_send() {
                     socket
                         .send_slice(buf)
                         .map_err(|_| SystemError::ECONNABORTED)
                 } else {
+                    log::error!("TcpSocket::try_send: no buffer {} {}", socket.may_send(), socket.state());
                     Err(SystemError::ENOBUFS)
                 }
             })

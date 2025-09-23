@@ -75,7 +75,7 @@ impl Syscall {
             let binding = ProcessManager::current_pcb();
             if binding.basic().name().contains("dropbear") {
                 // 如果是dropbear进程，打印系统调用号和参数
-                log::debug!(
+                print!(
                     "Syscall {}({}) called with args: {:x?}",
                     syscall_num,
                     syscall_number_to_str(syscall_num),

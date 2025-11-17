@@ -111,7 +111,10 @@ impl Syscall for SysExecve {
         let path = path.into_string().map_err(|_| SystemError::EINVAL)?;
 
         let pwd = ProcessManager::current_pcb().pwd_inode();
-        let inode = pwd.lookup(&path)?;
+        let inode = pwd.lookup(&path).map_err(|e| {
+            log::error!("Failed to lookup execve path {}: {:?}", path, e);
+            e
+        })?;
 
         Self::execve(inode, path, argv, envp, frame)?;
         return Ok(0);

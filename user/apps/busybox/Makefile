@@ -12,7 +12,7 @@ ifeq ($(ARCH), mipsel)
 	prefix := mipsel-linux-musln32-
 endif
 
-cc := $(prefix)gcc
+cc := $(prefix)cc
 strip := $(prefix)strip
 
 # 下载 busybox 的 md5sum 文件

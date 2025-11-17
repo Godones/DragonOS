@@ -143,6 +143,8 @@ GID（Group ID） 表示进程属于哪个主用户组。同样有 real/effectiv
 当进程访问文件、socket、IPC 等资源时，内核会根据 EUID/EGID + 附加组列表 来判断能否访问。
 
 
+##
+确保/bin/sh存在
 
 
 ## Reference
